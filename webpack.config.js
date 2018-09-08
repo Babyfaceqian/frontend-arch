@@ -3,7 +3,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const extractTextWebpackPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-
+const ENTRY_PATH = './src/entries/';
 // the path(s) that should be cleaned
 let pathsToClean = [
     'dist',
@@ -20,7 +20,7 @@ let cleanOptions = {
 var configFunc = (env, argv) => {
 
     const config = {
-        entry: "./src/index.jsx",
+        entry: ENTRY_PATH + "index.jsx",
         output: {
             path: path.resolve(__dirname, './dist'),
             filename: '[hash].bundle.js'
@@ -113,6 +113,9 @@ var configFunc = (env, argv) => {
             //     port: 3000
             // },
         },
+        resolve:{
+            extensions:['.js','.jsx','.json'] //表示这几种文件的后缀名可以省略，按照从前到后的方式来进行补全
+        },
         plugins: [
             // new webpack.optimize.UglifyJsPlugin({    // in webpack4, it will be enabled when mode is production.
             //     test: /\.js($|\?)/i,
@@ -123,7 +126,7 @@ var configFunc = (env, argv) => {
             new HtmlWebpackPlugin({ // 将js, css文件引入html中
                 title: "Frontend Arch",
                 filename: 'index.html',
-                template: 'src/index.template.html',
+                template: ENTRY_PATH + 'index.template.html',
                 inject: 'body',
                 hash: false // will append like bundle.js?[hash] if true, instead, we configure the hash in output.
             }),
