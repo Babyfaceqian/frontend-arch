@@ -26,15 +26,16 @@ var configFunc = (env, argv) => {
             filename: '[hash].bundle.js'
         },
         module: {
-            rules: [{
-                    test: /\.jsx$/,
-                    loader: 'eslint-loader',
-                    enforce: "pre",
-                    include: [path.resolve(__dirname, 'src')], // 指定检查的目录
-                    // options: { // 这里的配置项参数将会被传递到 eslint 的 CLIEngine 
-                    //     formatter: require('eslint-friendly-formatter') // 指定错误报告的格式规范
-                    // }
-                },
+            rules: [
+                // {
+                //     test: /\.jsx$/,
+                //     loader: 'eslint-loader',
+                //     enforce: "pre",
+                //     include: [path.resolve(__dirname, 'src')], // 指定检查的目录
+                //     // options: { // 这里的配置项参数将会被传递到 eslint 的 CLIEngine 
+                //     //     formatter: require('eslint-friendly-formatter') // 指定错误报告的格式规范
+                //     // }
+                // },
                 {
                     test: /\.(js|jsx)$/,
                     exclude: /node_modules/,
@@ -113,8 +114,8 @@ var configFunc = (env, argv) => {
             //     port: 3000
             // },
         },
-        resolve:{
-            extensions:['.js','.jsx','.json'] //表示这几种文件的后缀名可以省略，按照从前到后的方式来进行补全
+        resolve: {
+            extensions: ['.js', '.jsx', '.json'] //表示这几种文件的后缀名可以省略，按照从前到后的方式来进行补全
         },
         plugins: [
             // new webpack.optimize.UglifyJsPlugin({    // in webpack4, it will be enabled when mode is production.
