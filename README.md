@@ -1,5 +1,5 @@
 # react arch
-This branch is a base which includes the following open source libraries:
+This branch is a react arch base which includes the following open source libraries:
 
 babel, webpack, eslint, react
 
