@@ -4,6 +4,9 @@
     <meta charset="utf-8" />
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <style>
+        svg {
+            border: 1px solid black;
+        }
         .links line {
             stroke: #999;
             stroke-opacity: 0.6;
@@ -68,6 +71,31 @@
                 }
             }
             var radius = 15;
+            //Create links data 
+            var links_data = [
+                { "source": "Travis", "target": "Rake", "type": "A" },
+                { "source": "Diana", "target": "Rake", "type": "B" },
+                { "source": "Diana", "target": "Rachel", "type": "A" },
+                { "source": "Rachel", "target": "Rake", "type": "B" },
+                { "source": "Rachel", "target": "Shawn", "type": "A" },
+                { "source": "Emerald", "target": "Rachel", "type": "A" }
+            ];
+            var link_force = d3.forceLink(links_data)
+                .id(function (d) {
+                    return d.name;
+                })
+                .distance(200)
+                .strength(0); // 0 - 1
+            simulation.force('links', link_force)
+
+            var link = svg.append('g')
+                .attr('class', 'links')
+                .selectAll('line')
+                .data(links_data)
+                .enter()
+                .append('line')
+                .attr('stroke-width', 2)
+                .style('stroke', linkColor);
             var node = svg.append('g')
                 .attr('class', 'nodes')
                 .selectAll('circle')
@@ -118,31 +146,7 @@
                 // force_center.y(center_y);
             }
             simulation.on('tick', tickActions);
-            //Create links data 
-            var links_data = [
-                { "source": "Travis", "target": "Rake", "type": "A" },
-                { "source": "Diana", "target": "Rake", "type": "B" },
-                { "source": "Diana", "target": "Rachel", "type": "A" },
-                { "source": "Rachel", "target": "Rake", "type": "B" },
-                { "source": "Rachel", "target": "Shawn", "type": "A" },
-                { "source": "Emerald", "target": "Rachel", "type": "A" }
-            ];
-            var link_force = d3.forceLink(links_data)
-                .id(function (d) {
-                    return d.name;
-                })
-                .distance(200)
-                .strength(0); // 0 - 1
-            simulation.force('links', link_force)
 
-            var link = svg.append('g')
-                .attr('class', 'links')
-                .selectAll('line')
-                .data(links_data)
-                .enter()
-                .append('line')
-                .attr('stroke-width', 2)
-                .style('stroke', linkColor);
             //create drag handler with d3.drag()
             //only interested in "drag" event listener, not "start" or "end"        
             // var drag_handler = d3.drag()
@@ -170,15 +174,30 @@
             drag_handler(node);
 
             // apply force on X direction
-            var force_X = d3.forceX(400)
-                .strength(0.2);
-            simulation.force('force_x', force_X);
+            // var force_X = d3.forceX(400)
+            //     .strength(0.2);
+            // simulation.force('force_x', force_X);
 
             //make sure you can't drag the circle outside the box
             // function drag_drag(d) {
             //     d.fx = Math.max(radius, Math.min(width - radius, d3.event.x));
             //     d.fy = Math.max(radius, Math.min(height - radius, d3.event.y));
             // }
+
+            //specify what to do when zoom event listener is triggered 
+            function zoom_actions() {
+                node.attr("transform", d3.event.transform);
+                link.attr("transform", d3.event.transform);
+                // var transform = d3.zoomTransform(this);
+                // // same as  this.setAttribute("transform", "translate(" + transform.x + "," +
+                // //                             transform.y + ") scale(" + transform.k + ")");
+                // this.setAttribute("transform", transform)
+            }
+            //create zoom handler 
+            //zoom actions is a function that performs the zooming. 
+            var zoom_handler = d3.zoom()
+                .on("zoom", zoom_actions);
+            zoom_handler(svg);
         })()
     </script>
 </body>
