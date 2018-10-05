@@ -3,7 +3,8 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const extractTextWebpackPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const ENTRY_PATH = './src/entries/';
+const SOURCE_PATH = path.resolve(__dirname, './src');
+const ENTRY_PATH = SOURCE_PATH + '/entries/';
 // the path(s) that should be cleaned
 let pathsToClean = [
     'dist',
@@ -114,7 +115,10 @@ var configFunc = (env, argv) => {
             // },
         },
         resolve:{
-            extensions:['.js','.jsx','.json'] //表示这几种文件的后缀名可以省略，按照从前到后的方式来进行补全
+            extensions:['.js','.jsx','.json'], //表示这几种文件的后缀名可以省略，按照从前到后的方式来进行补全
+            alias: {
+                components: SOURCE_PATH + '/components'
+            }
         },
         plugins: [
             // new webpack.optimize.UglifyJsPlugin({    // in webpack4, it will be enabled when mode is production.

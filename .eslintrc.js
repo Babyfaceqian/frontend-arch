@@ -16,10 +16,10 @@ module.exports = {
         "react"
     ],
     "rules": {
-        "indent": [
-            "error",
-            4
-        ],
+        // "indent": [
+        //     "error",
+        //     1
+        // ],
         "linebreak-style": [
             "error",
             "unix"
