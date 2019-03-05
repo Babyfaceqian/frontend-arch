@@ -1,4 +1,39 @@
-.main {
-    text-align: center;
-    padding: 25%;
+.left {
+    width: 260px;
+    height: 100vh;
+    position: relative;
+    transition: margin-left .3s;
+    background: forestgreen;
+}
+.leftCollapsed {
+    margin-left: -260px;
+}
+.leftNotCollapsed {
+    margin-left: 0;
+}
+.right {
+    width: 300px;
+    height: 100vh;
+    position: relative;
+    transition: margin-right .3s;
+    background: forestgreen; 
+}
+.rightCollapsed {
+    margin-right: -300px;
+}
+.rightNotCollapsed {
+    margin-right: 0;
+}
+.bottom {
+    width: 100%;
+    height: 200px;
+    position: relative;
+    transition: margin-bottom .3s;
+    background: greenyellow;
+}
+.bottomCollapsed {
+    margin-bottom: -200px;
+}
+.bottomNotCollapsed {
+    margin-bottom: 0;
 }
