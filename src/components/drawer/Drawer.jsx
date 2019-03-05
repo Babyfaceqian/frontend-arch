@@ -33,16 +33,19 @@ class Drawer extends Component {
       cls = styles.left;
       toggleCls = visible ? styles.leftNotCollapsed : styles.leftCollapsed;
       // style = { top: '-' + (this.index - 1) * 100 + 'vh' };
+      style = { zIndex: number.left - this.index };
     }
     if (placement === 'right') {
       cls = styles.right;
       toggleCls = visible ? styles.rightNotCollapsed : styles.rightCollapsed;
       // style = { top: '-' + (this.index - 1) * 100 + 'vh' };
+      style = { zIndex: number.right - this.index };
     }
     if (placement === 'bottom') {
       cls = styles.bottom;
       toggleCls = visible ? styles.bottomNotCollapsed : styles.bottomCollapsed;
       // style = { top: '-' + (this.index - 1) * 200 + 'px' };
+      style = { zIndex: this.index };
     }
     return (
       <div className={`${cls} ${toggleCls}`} style={style}>

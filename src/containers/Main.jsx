@@ -10,6 +10,7 @@ export default class Main extends React.Component {
       leftCollapsed2: true,
       leftCollapsed3: true,
       rightCollapsed: true,
+      rightCollapsed2: true,
       bottomCollapsed: true,
       bottomCollapsed2: true
     };
@@ -37,8 +38,9 @@ export default class Main extends React.Component {
                 <button onClick={this.leftCollapse2}>左侧2</button>
                 <button onClick={this.leftCollapse3}>左侧3</button>
                 <button onClick={this.rightCollapse}>右侧</button>
+                <button onClick={this.rightCollapse2}>右侧2</button>
                 <button onClick={this.bottomCollapse}>下侧</button>
-                <button onClick={this.bottomCollapse2}>下侧</button>
+                <button onClick={this.bottomCollapse2}>下侧2</button>
               </div>
             </Layout.Item>
             <Layout.Item>
@@ -51,6 +53,8 @@ export default class Main extends React.Component {
         </Layout.Item>
         <Layout.Item>
           <Drawer placement='right' visible={!this.state.rightCollapsed}>This is right panel
+          </Drawer>
+          <Drawer placement='right' visible={!this.state.rightCollapsed2}>This is right panel 2
           </Drawer>
         </Layout.Item>
       </Layout>
@@ -78,7 +82,16 @@ export default class Main extends React.Component {
     });
   }
   rightCollapse = () => {
-    this.setState({ rightCollapsed: !this.state.rightCollapsed });
+    this.setState({ 
+      rightCollapsed: !this.state.rightCollapsed,
+      rightCollapsed2: true
+    });
+  }
+  rightCollapse2 = () => {
+    this.setState({ 
+      rightCollapsed2: !this.state.rightCollapsed2,
+      rightCollapsed: true
+     });
   }
   bottomCollapse = () => {
     this.setState({
