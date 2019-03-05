@@ -2,103 +2,105 @@
 <meta charset="utf-8">
 <style>
 </style>
-<svg width="800" height="500"></svg>
+<canvas id="" width="800" height="500"></canvas>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
-    var svg = d3.select("svg"),
-        width = +svg.attr("width"),
-        height = +svg.attr("height");
+    var chart = d3.select("canvas")
+        .attr("width", 400)
+        .attr("height", 300);
+    var context = chart.node().getContext("2d");
 
-    //used to capture drag position    
+    // Create an in memory only element of type 'custom'
+    var detachedContainer = document.createElement("custom");
+
+    // Create a d3 selection for the detached container. We won't
+    // actually be attaching it to the DOM.
+    var dataContainer = d3.select(detachedContainer);
+
+    // Function to create our custom data containers
+    function drawCustom(data) {
+        var scale = d3.scaleLinear()
+            .range([10, 390])
+            .domain(d3.extent(data));
+
+        var dataBinding = dataContainer.selectAll("custom.circle")
+            .data(data, function (d) {
+                return d;
+            });
+
+        dataBinding
+            .attr("r", 8)
+            .transition()
+            .duration(1000)
+            .attr("r", 15)
+            .attr("fillStyle", "green");
+
+        dataBinding.enter()
+            .append("custom")
+            .classed("circle", true)
+            .attr("cx", scale)
+            .attr("cy", 100)
+            .attr("r", 8)
+            .attr("fillStyle", "red");
+
+        dataBinding.exit()
+            .attr("r", 8)
+            .transition()
+            .duration(1000)
+            .attr("r", 5)
+            .attr("fillStyle", "lightgrey");
+
+    }
+    chart.call(d3.drag()
+    .on('start', dragStart))
+    .on('drag', dragging())
+    .on('end', dragEnd)
     var start_x, start_y;
-
-    //create some circles at random points on the screen 
-    //create 50 circles of radius 20
-    //specify centre points randomly through the map function 
-    var radius = 20;
-    var circle_data = d3.range(50).map(function () {
-        return {
-            x: Math.round(Math.random() * (width - radius * 2) + radius),
-            y: Math.round(Math.random() * (height - radius * 2) + radius)
-        };
-    });
-
-    //stylish black rectangle for sexy looks 
-    var rect = svg.append("g")
-        .attr("class", "rect")
-        .append("rect")
-        .attr("width", width)
-        .attr("height", height)
-        .style("fill", "black");
-
-    //funky yellow circles   
-    var circles = d3.select("svg")
-        .append("g")
-        .attr("class", "circles")
-        .selectAll("circle")
-        .data(circle_data)
-        .enter()
-        .append("circle")
-        .attr("cx", function (d) {
-            return (d.x)
+    function dragStart() {
+        start_x = d3.event.x;
+        start_y = d3.event.y;
+        var elements = dataContainer.selectAll("custom.circle");
+        console.log('elements', elements);
+        elements.each(function (d) {
+            var node = d3.select(this);
+            
         })
-        .attr("cy", function (d) {
-            return (d.y)
+        console.log('dragStart', start_x, start_y);
+    }
+    function dragging() {
+        console.log('dragging')
+    }
+    function dragEnd() {
+        console.log('dragEnd')
+    }
+    // Function to render out to canvas our custom
+    // in memory nodes
+    function drawCanvas() {
+        // clear canvas
+        context.fillStyle = "#fff";
+        context.rect(0, 0, chart.attr("width"), chart.attr("height"));
+        context.fill();
+
+        // select our dummy nodes and draw the data to canvas.
+        var elements = dataContainer.selectAll("custom.circle");
+        elements.each(function (d) {
+            var node = d3.select(this);
+
+            context.beginPath();
+            context.fillStyle = node.attr("fillStyle");
+            context.arc(node.attr("cx"), node.attr("cy"), node.attr("r"), 0, 2 * Math.PI);
+            context.fill();
+            context.closePath();
+
         })
-        .attr("r", radius)
-        .attr("fill", "yellow");
-
-    /* 
-     * DRAG BEHAVIOUR         
-     */
-
-    //create drag handler with d3.drag()
-    var drag_handler = d3.drag()
-        .on("start", drag_start)
-        .on("drag", drag_drag);
-
-    function drag_start() {
-        // get starting location of the drag 
-        // used to offset the circle 
-        start_x = +d3.event.x;
-        start_y = +d3.event.y;
     }
+    // chart.call(d3.zoom().on("zoom", zoomed))
 
-    function drag_drag(d) {
-        //Get the current scale of the circle 
-        //case where we haven't scaled the circle yet
-        if (this.getAttribute("transform") === null) {
-            current_scale = 1;
-        }
-        //case where we have transformed the circle 
-        else {
-            current_scale_string = this.getAttribute("transform").split(' ')[1];
-            console.log('this.getAttribute("transform")', this.getAttribute("transform"))
-            current_scale = +current_scale_string.substring(6, current_scale_string.length - 1);
-        }
-        d3.select(this)
-            .attr("cx", d.x = start_x + ((d3.event.x - start_x) / current_scale))
-            .attr("cy", d.y = start_y + ((d3.event.y - start_y) / current_scale));
+    function zoomed() {
+        console.log('zoomed', d3.event.transform.k)
+        context.scale(d3.event.transform.k, d3.event.transform.k)
     }
-
-    //apply the drag_handler to our circles 
-    drag_handler(circles);
-
-    /* 
-     * ZOOM BEHAVIOUR         
-     */
-
-    //create zoom handler 
-    var zoom_handler = d3.zoom()
-        .on("zoom", zoom_actions);
-
-
-    //specify what to do when zoom event listener is triggered 
-    function zoom_actions() {
-        circles.attr("transform", d3.event.transform);
-    }
-
-    //add zoom behaviour to the svg element backing our graph.  
-    //same thing as svg.call(zoom_handler); 
-    zoom_handler(svg);
+    var t = d3.timer(drawCanvas);
+    drawCustom([1, 2, 13, 20, 23]);
+    drawCustom([1, 2, 12, 16, 20]);
 </script>
