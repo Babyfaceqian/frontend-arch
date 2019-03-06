@@ -8,7 +8,7 @@ export default class Main extends React.Component {
   render() {
     return (
       <div className={styles.main}>
-        <Watermark id="watermark" style={{ color: 'green', fontSize: '2em', transform: 'rotate(-30deg)' }} />
+        <Watermark id="watermark" style={{ color: 'green', fontSize: '2em', transform: 'rotate(-30deg)' }} text="12313"/>
       </div>
     );
   }

@@ -7,7 +7,7 @@ class Watermark extends React.Component {
     super(props);
   }
   componentDidMount() {
-    const { id, style, number } = this.props;
+    const { id, style, number, text } = this.props;
     let container = document.getElementById(id);
     let item = [];
     let styleStr = '';
@@ -19,7 +19,7 @@ class Watermark extends React.Component {
       styleStr = style;
     }
     for (let i = 0; i < number; i++) {
-      item[i] = `<span class=${styles.item} style=${styleStr}>张麦扣</span>`;
+      item[i] = `<span class=${styles.item} style=${styleStr}>${text}</span>`;
     }
     container.innerHTML = `${item.join(' ')}`;
     html2canvas(container).then(canvas => {
@@ -36,6 +36,7 @@ class Watermark extends React.Component {
   }
 }
 Watermark.defaultProps = {
-  number: 100
+  number: 100,
+  text: ''
 }
 export default Watermark;
