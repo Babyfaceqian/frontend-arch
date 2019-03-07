@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './Main.less';
-
+import FlexibleBox from 'components/flexibleBox/FlexibleBox';
 export default class Main extends React.Component {
   constructor(props) {
     super(props);
@@ -11,7 +11,7 @@ export default class Main extends React.Component {
   }
   render() {
     return (
-      <div className={styles.main}>This is React Arch branch.</div>
+      <FlexibleBox />
     );
   }
 }
