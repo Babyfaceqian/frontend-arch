@@ -5,102 +5,78 @@
 <canvas id="" width="800" height="500"></canvas>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
-    var chart = d3.select("canvas")
-        .attr("width", 400)
-        .attr("height", 300);
-    var context = chart.node().getContext("2d");
+    var canvas = d3.select('canvas');
+    var context = canvas.node().getContext('2d');
+    var data = [];
+    // 创建数据
+    d3.range(2).forEach(function (el) {
+        data.push({
+            value: el
+        });
+    });
 
-    // Create an in memory only element of type 'custom'
-    var detachedContainer = document.createElement("custom");
-
-    // Create a d3 selection for the detached container. We won't
-    // actually be attaching it to the DOM.
-    var dataContainer = d3.select(detachedContainer);
-
-    // Function to create our custom data containers
-    function drawCustom(data) {
-        var scale = d3.scaleLinear()
-            .range([10, 390])
-            .domain(d3.extent(data));
-
-        var dataBinding = dataContainer.selectAll("custom.circle")
-            .data(data, function (d) {
-                return d;
-            });
-
-        dataBinding
-            .attr("r", 8)
-            .transition()
-            .duration(1000)
-            .attr("r", 15)
-            .attr("fillStyle", "green");
-
-        dataBinding.enter()
-            .append("custom")
-            .classed("circle", true)
-            .attr("cx", scale)
-            .attr("cy", 100)
-            .attr("r", 8)
-            .attr("fillStyle", "red");
-
-        dataBinding.exit()
-            .attr("r", 8)
-            .transition()
-            .duration(1000)
-            .attr("r", 5)
-            .attr("fillStyle", "lightgrey");
-
+    // 绑定数据
+    function dataBind(data) {
+        data.forEach(function (d, index) {
+            d.x = index * 100;
+            d.y = index * 200;
+        });
     }
-    chart.call(d3.drag()
-    .on('start', dragStart))
-    .on('drag', dragging())
-    .on('end', dragEnd)
-    var start_x, start_y;
-    function dragStart() {
-        start_x = d3.event.x;
-        start_y = d3.event.y;
-        var elements = dataContainer.selectAll("custom.circle");
-        console.log('elements', elements);
-        elements.each(function (d) {
-            var node = d3.select(this);
-            
+    dataBind(data);
+    // 创建元素
+    var customBase = document.createElement('custom');
+    var custom = d3.select(customBase);
+    var join = custom.selectAll('custom.rect')
+        .data(data);
+    var enterSel = join.enter()
+        .append('custom')
+        .attr('class', 'rect')
+        .attr("x", function (d, i) {
+            return d.x;
         })
-        console.log('dragStart', start_x, start_y);
-    }
-    function dragging() {
-        console.log('dragging')
-    }
-    function dragEnd() {
-        console.log('dragEnd')
-    }
-    // Function to render out to canvas our custom
-    // in memory nodes
-    function drawCanvas() {
-        // clear canvas
-        context.fillStyle = "#fff";
-        context.rect(0, 0, chart.attr("width"), chart.attr("height"));
-        context.fill();
-
-        // select our dummy nodes and draw the data to canvas.
-        var elements = dataContainer.selectAll("custom.circle");
-        elements.each(function (d) {
-            var node = d3.select(this);
-
-            context.beginPath();
-            context.fillStyle = node.attr("fillStyle");
-            context.arc(node.attr("cx"), node.attr("cy"), node.attr("r"), 0, 2 * Math.PI);
-            context.fill();
-            context.closePath();
-
+        .attr("y", function (d, i) {
+            return d.y
         })
+        .attr('width', 0)
+        .attr('height', 0);
+    join
+        .merge(enterSel)
+        .transition()
+        .attr('width', 10)
+        .attr('height', 10)
+        .attr('fillStyle', function (d) {
+            return 'black';
+        });
+    var exitSel = join.exit()
+        .transition()
+        .attr('width', 0)
+        .attr('height', 0)
+        .remove();
+    // 创建缩放
+    var _zoom = d3.zoom().on('zoom', function (d) {
+        console.log('zooming');
+        var transform = d3.event.transform;
+        context.save();
+        context.clearRect(0, 0, 800, 500);
+        context.translate(transform.x, transform.y);
+        context.scale(transform.k, transform.k);
+        draw();
+        context.restore();
+    });
+    canvas.call(_zoom);
+    var elements = custom.selectAll('custom.rect');
+    elements.on('click', function () {
+        console.log('clicked!!')
+    })
+    // 绘制
+    function draw() {
+        elements.each(function (d, i) {
+            var node = d3.select(this);
+            context.fillStyle = node.attr('fillStyle');
+            context.fillRect(node.attr('x'), node.attr('y'), node.attr('width'), node.attr('height'));
+        });
     }
-    // chart.call(d3.zoom().on("zoom", zoomed))
 
-    function zoomed() {
-        console.log('zoomed', d3.event.transform.k)
-        context.scale(d3.event.transform.k, d3.event.transform.k)
-    }
-    var t = d3.timer(drawCanvas);
-    drawCustom([1, 2, 13, 20, 23]);
-    drawCustom([1, 2, 12, 16, 20]);
+    // 第一次绘制
+    draw();
 </script>
