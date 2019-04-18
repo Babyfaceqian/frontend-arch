@@ -3,12 +3,123 @@
 <head>
     <meta charset="utf-8" />
     <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="data/data.js"></script>
 </head>
 
 <body>
+    <svg id="svg"></svg>
     <script>
         (function () {
-            /* start your code here */
+            // 初始化
+            let svg = d3.select('#svg');
+            let _width = 600;
+            let _height = 300;
+            svg.attr('height', _height).attr('width', _width);
+            svg
+                .on('wheel', function () {
+                    if (d3.event.shiftKey) {
+                        console.log('d3', d3.event);
+                        let newXOffset = xOffset + d3.event.wheelDeltaX;
+                        if (newXOffset > 0) {
+                            newXOffset = xOffset = 0;
+                        } else {
+                            xOffset = newXOffset;
+                        }
+                        xScroll.attr('transform', 'translate(' + newXOffset + ',0)')
+                    } else {
+                        let newYOffset = yOffset + d3.event.wheelDeltaY;
+                        if (newYOffset > 0) {
+                            newYOffset = yOffset = 0;
+                        } else {
+                            yOffset = newYOffset;
+                        }
+                        yScroll.attr('transform', 'translate(0,' + newYOffset + ')')
+                    }
+                })
+                .on('click', function () {
+                    console.log('clicked')
+                })
+            // x轴比例尺
+            let xDomain = [1, 2, 3, 5, 7, 13, 18, 30];
+            let xScale = d3
+                .scaleLinear()
+                .domain(xDomain)
+            // y轴
+            let yDomain = [1, 2, 3];
+            let yScale = d3
+                .scaleLinear()
+                .domain(yDomain)
+            // x轴窗口容器
+            let xOffset = 0;
+            let yOffset = 0;
+            let xWindow = svg.append('g')
+                .attr('class', 'xWindow')
+                .attr('width', _width)
+                .attr('height', _height)
+            // y轴窗口容器
+            let yWindow = svg.append('g')
+                .attr('class', 'yWindow')
+                .attr('width', _width)
+                .attr('height', _height)
+            // x轴滚动容器
+            let xScroll = xWindow.append('g')
+                .attr('class', 'xScroll')
+                .attr('width', _width * 4)
+                .attr('height', _height)
+            let handleDrag = function () {
+                console.log('event', d3.event)
+            }
+            xScroll.call(d3.drag().on('drag', handleDrag));
+            // y轴滚动容器
+            let yScroll = yWindow.append('g')
+                .attr('class', 'yScroll')
+                .attr('width', _width)
+                .attr('height', _height * 4)
+            // 创建x轴
+            let xLabel_x = {};
+            d3.map(xDomain, d => {
+                xLabel_x[d] = 50 + xScale(d) * 40;
+            });
+            let xLabels = xScroll.selectAll('xLabel').data(xDomain).enter().append('g')
+                .attr('class', 'xLabel')
+                .attr('transform', d => {
+                    return 'translate(' + xLabel_x[d] + ', 260)';
+                })
+            // xLabels.append('rect')
+            //     .attr('class', 'label_bk')
+            //     .attr('fill', 'blue')
+            //     .attr('width', _width - 100)
+            //     .attr('height', 20)
+            xLabels.append('text').text(d => d).attr('fill', 'black')
+            let xCircle = xLabels.append('circle')
+                .attr('r', 5)
+                .attr('fill', 'black')
+                .attr('cx', 5)
+                .attr('cy', -20)
+            let xLines = xLabels.append('line')
+                .attr('stroke', 'black')
+                .attr('x1', 5)
+                .attr('y1', -20)
+                .attr('x2', 5)
+                .attr('y2', -300)
+                .attr('stroke-dasharray', 3)
+            // 创建y轴
+            let yLabel_y = {};
+            d3.map(xDomain, d => {
+                yLabel_y[d] = 50 + yScale(d) * 40;
+            });
+            console.log('yLabel_y', yLabel_y);
+            let yLabels = yScroll.selectAll('yLabel').data(yDomain).enter().append('g')
+                .attr('class', 'yLabel')
+                .attr('transform', d => {
+                    return 'translate(20,' + yLabel_y[d] + ')';
+                })
+            yLabels.append('rect')
+                .attr('class', 'label_bk')
+                .attr('fill', 'blue')
+                .attr('width', _width - 100)
+                .attr('height', 20)
+            yLabels.append('text').text(d => 'person-' + d).attr('fill', 'black')
         })()
     </script>
 </body>
