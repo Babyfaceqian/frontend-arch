@@ -1,4 +1,5 @@
 # zrender demo
+[zrender官方链接](https://ecomfe.github.io/zrender-doc/public/)
 ## 类继承关系
 元素类（`Circle`等）继承`Displayable`类
 `Displayable`类 继承`Element`类
