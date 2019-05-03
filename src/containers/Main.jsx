@@ -49,6 +49,20 @@ export default class Main extends React.Component {
         },
         pattern: 0,
       },
+      {
+        id: '101001_3',
+        data: {
+          value: 1
+        },
+        pattern: 0,
+      },
+      {
+        id: '101001_4',
+        data: {
+          value: 1
+        },
+        pattern: 0,
+      }
     ])
   }
   getNodes = () => {

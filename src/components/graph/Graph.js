@@ -11,26 +11,68 @@ import * as consts from './constants';
  */
 const Graph = function (dom, opts = consts.INITIAL_OPTS) {
   if (!dom) throw 'A dom is required.'
-  this.zr = zrender.init(dom, opts);
-  this.zr.on('click', (e) => {
-    if (!e.target) {
-      this.clearSelectedNodes();
-      this.clearSelectedLinks();
-    }
-  })
-  this.nodeGroup;
-  this.linkGroup;
-  this.selectedNodes = [];
-  this.selectedLinks = [];
-  this.highlighedNodes = [];
+  this.init(dom, opts);
 }
 Graph.prototype = {
+  init: function (dom, opts) {
+    this.zr = zrender.init(dom, opts);
+    this.zr.on('click', e => {
+      if (!e.target) {
+        this.clearSelectedNodes();
+        this.clearSelectedLinks();
+      }
+    })
+    this.zr.on('mousewheel', e => {
+      // 监听鼠标滚轮事件
+      console.log('e', e);
+      let z = this.nodeAndLinkGroup.scale;
+      z = [z[0] - e.wheelDelta, z[1] - e.wheelDelta];
+      let origin = [e.offsetX, e.offsetY];
+      this.zoom(z, origin);
+    })
+    this.nodeAndLinkGroup = new zrender.Group();
+    // 创建拖拽框
+    this.dragRect = new zrender.Rect(consts.DRAG_RECT_OPT);
+    this.dragRect.on('dragstart', e => {
+      this._x = e.offsetX;
+      this._y = e.offsetY;
+    })
+    this.dragRect.on('drag', e => {
+      let target = e.target;
+      let x = e.offsetX;
+      let y = e.offsetY;
+      let dx = x - this._x;
+      let dy = y - this._y;
+      this._x = x;
+      this._y = y;
+      this.transform(dx, dy);
+    })
+    this.nodeAndLinkGroup.add(this.dragRect);
+    // 创建缩放框
+    // this.zoomRect = new zrender.Rect(consts.ZOOM_RECT_OPT);
+    // this.zoomRect.on('mousewheel', e => {
+    //   // 监听鼠标滚轮事件
+    //   let origin = [e.offsetX, e.offsetY];
+    //   let z = this.nodeAndLinkGroup.scale;
+    //   z = [z[0] - e.wheelDelta, z[1] - e.wheelDelta];
+    //   this.zoomRect.attr('scale', z);
+    //   console.log('zoomRect', this.zoomRect)
+    //   // this.zoom(z, origin);
+    // })
+    this.nodeAndLinkGroup.add(this.zoomRect);
+    this.zr.add(this.nodeAndLinkGroup);
+    this.nodeGroup;
+    this.linkGroup;
+    this.selectedNodes = [];
+    this.selectedLinks = [];
+    this.highlighedNodes = [];
+  },
   addNodes: function (opts) {
     if (!zrender.util.isArray(opts)) throw 'arguments must be an array.'
     if (!this.nodeGroup) {
       // 添加node容器
       this.nodeGroup = new zrender.Group();
-      this.zr.add(this.nodeGroup);
+      this.nodeAndLinkGroup.add(this.nodeGroup);
     }
     opts.forEach(opt => {
       let pattern = opt.pattern || 0; // 选择节点模板
@@ -97,7 +139,7 @@ Graph.prototype = {
     });
   },
   clearSelectedNodes: function () {
-    this.nodeGroup.children().forEach(s => {
+    this.nodeGroup && this.nodeGroup.children().forEach(s => {
       let pattern = s.pattern || 0; // 选择节点模板
       let style = {
         ...s.style,
@@ -119,7 +161,7 @@ Graph.prototype = {
     });
   },
   clearHighlightedNodes: function () {
-    this.nodeGroup.children().forEach(s => {
+    this.nodeGroup && this.nodeGroup.children().forEach(s => {
       let style = {
         ...s.style,
         opacity: 1
@@ -133,7 +175,7 @@ Graph.prototype = {
     if (!this.linkGroup) {
       // 添加link容器
       this.linkGroup = new zrender.Group();
-      this.zr.add(this.linkGroup);
+      this.nodeAndLinkGroup.add(this.linkGroup);
     }
     opts.forEach(opt => {
       let pattern = opt.pattern || 0; // 选择link模板
@@ -175,7 +217,7 @@ Graph.prototype = {
       targetNode_link.push(link);
       sourceNode.attr('link', sourceNode_link);
       targetNode.attr('link', targetNode_link);
-      
+
       this.linkGroup.add(link);
     })
   },
@@ -199,7 +241,7 @@ Graph.prototype = {
     });
   },
   clearSelectedLinks: function () {
-    this.linkGroup.children().forEach(s => {
+    this.linkGroup && this.linkGroup.children().forEach(s => {
       let pattern = s.pattern || 0; // 选择link模板
       let style = {
         ...s.style,
@@ -208,6 +250,18 @@ Graph.prototype = {
       s.attr('style', style);
     });
     this.selectedLinks = [];
+  },
+  zoom: function (z, origin) {
+    // FIXME: 缩放位置不正确    
+    this.nodeAndLinkGroup.attr('origin', origin);
+    this.nodeAndLinkGroup.attr('scale', z);
+  },
+  transform: function (dx, dy) {
+    let position = this.nodeAndLinkGroup.position || [0, 0];
+    position[0] += dx;
+    position[1] += dy;
+    this.nodeAndLinkGroup.attr('position', position);
+    this.dragRect.attr('position', position);
   }
 }
 
