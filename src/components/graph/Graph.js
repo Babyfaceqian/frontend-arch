@@ -294,7 +294,13 @@ Graph.prototype = {
     // FIXME: 缩放位置不正确    
     this.nodeAndLinkGroup.attr('origin', origin);
     this.nodeAndLinkGroup.attr('scale', z);
-
+    // node大小不随缩放变换
+    this.getNodes().forEach(node => {
+      node.attr('shape', {
+        ...consts.NODE_OPT[node.pattern || 0].shape,
+        r: consts.NODE_OPT[node.pattern || 0].shape.r / z[0]
+      });
+    });
   },
   transform: function (dx, dy) {
     let position = this.nodeAndLinkGroup.position || [0, 0];

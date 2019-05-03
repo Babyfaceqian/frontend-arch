@@ -35,7 +35,8 @@ export const LINK_OPT = [{
   },
   style: {
     stroke: '#000',
-    lineWidth: '3'
+    lineWidth: '3',
+    strokeNoScale: true, // 粗细不随缩放变换
   },
   z: 2
 }]
