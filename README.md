@@ -1,25 +1,25 @@
 # zrender demo
 [zrender官方链接](https://ecomfe.github.io/zrender-doc/public/)
 ## 类继承关系
-元素类（`Circle`等）继承`Displayable`类
+- 元素类（`Circle`等）继承`Displayable`类
 `Displayable`类 继承`Element`类
-容器类（`Group`) 继承`Element`类
-`Element`类 继承`Animatable`、 `Transformable`、 `Eventful`基础类
+- 容器类（`Group`) 继承`Element`类
+- `Element`类 继承`Animatable`、 `Transformable`、 `Eventful`基础类
 ## 组件封装
 封装组件Graph
 1. 将初始化的`zr`实例作为`Graph`的属性
 2. `Graph`拥有自己的属性和方法
 3. 对外开放`Graph`和`zr`的属性和方法
 ## 支持功能
-[x] 支持鼠标事件，可在元素上绑定事件，因为元素类继承事件类
-[x] 属性初始化及更新支持，参考`zrender.Displayable`类
-[x] 元素可拖拽，参考`zrender.Displayable`类
-[x] 容器，参考`zrender.Group`类
-[x] 所有元素（容器也算元素）都可缩放变换，参考`zrender.Transformable`类
-[x] 所有元素都可添加动画，参考`zrender.Animatable`类
-[x] 元素可添加文字并设置文字属性
-[x] 更改元素属性自动刷新画布，也可手动立即刷新
-[x] ……
+- [x] 支持鼠标事件，可在元素上绑定事件，因为元素类继承事件类
+- [x] 属性初始化及更新支持，参考`zrender.Displayable`类
+- [x] 元素可拖拽，参考`zrender.Displayable`类
+- [x] 容器，参考`zrender.Group`类
+- [x] 所有元素（容器也算元素）都可缩放变换，参考`zrender.Transformable`类
+- [x] 所有元素都可添加动画，参考`zrender.Animatable`类
+- [x] 元素可添加文字并设置文字属性
+- [x] 更改元素属性自动刷新画布，也可手动立即刷新
+- [ ] ……
 ## 已实现的需求
 1. node、link的添加与删除（结构基于研判的node、link）
 2. node、link的选中与高亮
