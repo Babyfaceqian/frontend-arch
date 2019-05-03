@@ -12,6 +12,10 @@ import * as consts from './constants';
 const Graph = function (dom, opts = consts.INITIAL_OPTS) {
   if (!dom) throw 'A dom is required.'
   this.init(dom, opts);
+  // 功能配置
+  this.options = {
+    selectMode: false
+  };
 }
 Graph.prototype = {
   init: function (dom, opts) {
@@ -22,58 +26,97 @@ Graph.prototype = {
         this.clearSelectedLinks();
       }
     })
+    // 鼠标滚轮缩放
+    this.scale = 1.0;
     this.zr.on('mousewheel', e => {
-      // 监听鼠标滚轮事件
-      console.log('e', e);
-      let z = this.nodeAndLinkGroup.scale;
-      z = [z[0] - e.wheelDelta, z[1] - e.wheelDelta];
-      let origin = [e.offsetX, e.offsetY];
-      this.zoom(z, origin);
+      let scale = this.scale;
+      let newScale = scale - e.wheelDelta / 10;
+      if (newScale < 0.3 || newScale > 3) return;
+      this.scale = newScale;
+      let position = this.nodeAndLinkGroup.position;
+      let [x, y] = this.nodeAndLinkGroup.transformCoordToLocal(e.offsetX, e.offsetY);
+      let origin = [x, y];
+      this.zoom([newScale, newScale], origin);
+    });
+    // 画布拖拽 + 选择框
+    this.dragData = {};
+    this.selectData = {};
+    this.zr.on('mousedown', e => {
+      if (this.options.selectMode) {
+        // 选框
+        if (e.target == undefined) {
+          this.selectData.drag = true;
+          this.selectData.ox = e.offsetX;
+          this.selectData.oy = e.offsetY;
+          this.selectRect = new zrender.Rect({
+            ...consts.SELECT_RECT_OPT,
+            shape: {
+              x: e.offsetX,
+              y: e.offsetY,
+              width: 0,
+              height: 0
+            }
+          });
+          this.zr.add(this.selectRect);
+        }
+      } else {
+        // 拖拽
+        if (e.target == undefined) {
+          this.dragData.drag = true;
+          this.dragData.ox = e.offsetX;
+          this.dragData.oy = e.offsetY;
+        }
+      }
     })
+    this.zr.on('mouseup', e => {
+      this.dragData.drag = false;
+      if (this.selectData.drag) {
+        // 选框
+        this.selectData.drag = false;
+        let selectedNodes = [];
+        this.getNodes().forEach(node => {
+          let _x = node.position[0] + node.shape.cx;
+          let _y = node.position[1] + node.shape.cy;
+          let [x, y] = this.nodeAndLinkGroup.transformCoordToGlobal(_x, _y);
+          if (this.selectRect.rectContain(x, y)) {
+            selectedNodes.push(node);
+          }
+        });
+        this.setSelectedNodes(selectedNodes);
+        this.zr.remove(this.selectRect);
+      }
+    })
+    this.zr.on('mousemove', e => {
+      if (this.dragData.drag) {
+        // 拖拽
+        let dx = e.offsetX - this.dragData.ox;
+        let dy = e.offsetY - this.dragData.oy;
+        this.dragData.ox = e.offsetX;
+        this.dragData.oy = e.offsetY;
+        this.transform(dx, dy);
+      } else if (this.selectData.drag) {
+        // 选框
+        let shape = this.selectRect.shape;
+        shape.width = (e.offsetX - this.selectData.ox);
+        shape.height = (e.offsetY - this.selectData.oy);
+        this.selectRect.attr('shape', shape);
+      }
+    })
+    // 添加node和link容器
     this.nodeAndLinkGroup = new zrender.Group();
-    // 创建拖拽框
-    this.dragRect = new zrender.Rect(consts.DRAG_RECT_OPT);
-    this.dragRect.on('dragstart', e => {
-      this._x = e.offsetX;
-      this._y = e.offsetY;
-    })
-    this.dragRect.on('drag', e => {
-      let target = e.target;
-      let x = e.offsetX;
-      let y = e.offsetY;
-      let dx = x - this._x;
-      let dy = y - this._y;
-      this._x = x;
-      this._y = y;
-      this.transform(dx, dy);
-    })
-    this.nodeAndLinkGroup.add(this.dragRect);
-    // 创建缩放框
-    // this.zoomRect = new zrender.Rect(consts.ZOOM_RECT_OPT);
-    // this.zoomRect.on('mousewheel', e => {
-    //   // 监听鼠标滚轮事件
-    //   let origin = [e.offsetX, e.offsetY];
-    //   let z = this.nodeAndLinkGroup.scale;
-    //   z = [z[0] - e.wheelDelta, z[1] - e.wheelDelta];
-    //   this.zoomRect.attr('scale', z);
-    //   console.log('zoomRect', this.zoomRect)
-    //   // this.zoom(z, origin);
-    // })
-    this.nodeAndLinkGroup.add(this.zoomRect);
     this.zr.add(this.nodeAndLinkGroup);
-    this.nodeGroup;
-    this.linkGroup;
+    // 添加node容器
+    this.nodeGroup = new zrender.Group();
+    this.nodeAndLinkGroup.add(this.nodeGroup);
+    // 添加link容器
+    this.linkGroup = new zrender.Group();
+    this.nodeAndLinkGroup.add(this.linkGroup);
     this.selectedNodes = [];
     this.selectedLinks = [];
     this.highlighedNodes = [];
   },
   addNodes: function (opts) {
     if (!zrender.util.isArray(opts)) throw 'arguments must be an array.'
-    if (!this.nodeGroup) {
-      // 添加node容器
-      this.nodeGroup = new zrender.Group();
-      this.nodeAndLinkGroup.add(this.nodeGroup);
-    }
     opts.forEach(opt => {
       let pattern = opt.pattern || 0; // 选择节点模板
       let _opt = zrender.util.clone(consts.NODE_OPT[pattern]);
@@ -121,6 +164,10 @@ Graph.prototype = {
           })
         })
       this.nodeGroup.add(node);
+      // 节点动画
+      node.animateTo({
+        position: [this.zr.getWidth() / 3, this.zr.getHeight() / 3]
+      }, 1000, 500, 'cubicOut');
     })
   },
   getNodes: function () {
@@ -129,7 +176,6 @@ Graph.prototype = {
   setSelectedNodes: function (nodes) {
     this.clearSelectedNodes();
     this.selectedNodes = nodes;
-    console.log('this.selectedNodes.', this.selectedNodes);
     this.selectedNodes.forEach(s => {
       let style = {
         ...s.style,
@@ -139,7 +185,7 @@ Graph.prototype = {
     });
   },
   clearSelectedNodes: function () {
-    this.nodeGroup && this.nodeGroup.children().forEach(s => {
+    this.nodeGroup && this.getNodes().forEach(s => {
       let pattern = s.pattern || 0; // 选择节点模板
       let style = {
         ...s.style,
@@ -161,7 +207,7 @@ Graph.prototype = {
     });
   },
   clearHighlightedNodes: function () {
-    this.nodeGroup && this.nodeGroup.children().forEach(s => {
+    this.nodeGroup && this.getNodes().forEach(s => {
       let style = {
         ...s.style,
         opacity: 1
@@ -172,16 +218,11 @@ Graph.prototype = {
   },
   addLinks: function (opts) {
     if (!zrender.util.isArray(opts)) throw 'arguments must be an array.'
-    if (!this.linkGroup) {
-      // 添加link容器
-      this.linkGroup = new zrender.Group();
-      this.nodeAndLinkGroup.add(this.linkGroup);
-    }
     opts.forEach(opt => {
       let pattern = opt.pattern || 0; // 选择link模板
       let _opt = zrender.util.clone(consts.LINK_OPT[pattern]);
-      let sourceNode = this.nodeGroup.children().find(n => n.id === opt.source);
-      let targetNode = this.nodeGroup.children().find(n => n.id === opt.target);
+      let sourceNode = this.getNodes().find(n => n.id === opt.source);
+      let targetNode = this.getNodes().find(n => n.id === opt.target);
       let shape = {
         ..._opt.shape,
         x1: sourceNode.shape.cx + sourceNode.position[0],
@@ -228,13 +269,11 @@ Graph.prototype = {
     this.clearSelectedLinks();
     this.clearSelectedNodes();
     this.selectedLinks = links;
-    console.log('this.selectedLinks', this.selectedLinks);
     this.selectedLinks.forEach(s => {
       let style = {
         ...s.style,
         ...consts.SELECTED_LINK_OPT.style
       };
-      console.log('style', style);
       s.attr('style', style);
       // 同时选中连接的两个节点
       this.setSelectedNodes([s.sourceEle, s.targetEle]);
@@ -255,13 +294,27 @@ Graph.prototype = {
     // FIXME: 缩放位置不正确    
     this.nodeAndLinkGroup.attr('origin', origin);
     this.nodeAndLinkGroup.attr('scale', z);
+
   },
   transform: function (dx, dy) {
     let position = this.nodeAndLinkGroup.position || [0, 0];
     position[0] += dx;
     position[1] += dy;
     this.nodeAndLinkGroup.attr('position', position);
-    this.dragRect.attr('position', position);
+  },
+  changeOptions: function (opts) {
+    let newOpts = {
+      ...this.options,
+      ...opts
+    };
+    this.options = newOpts;
+  },
+  resetTransform: function () {
+    this.scale = 1.0;
+    this.nodeAndLinkGroup.animateTo({
+      scale: [1, 1],
+      position: [0, 0]
+    }, 500, 0, 'cubicOut')
   }
 }
 

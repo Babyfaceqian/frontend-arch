@@ -15,7 +15,7 @@ export const NODE_OPT = [{
     stroke: 'none'
   },
   draggable: true,
-  z: 2
+  z: 3
 }];
 export const SELECTED_NODE_OPT = {
   style: {
@@ -48,36 +48,9 @@ export const SELECTED_LINK_OPT = {
     lineWidth: '3'
   }
 }
-export const DRAG_RECT_OPT = {
-  shape: {
-    x: -5000,
-    y: -5000,
-    height: 10000,
-    width: 10000
-  },
-  draggable: true,
-  invisible: true,
-  z: 0
-}
 export const SELECT_RECT_OPT = {
-  shape: {
-    x: -5000,
-    y: -5000,
-    height: 10000,
-    width: 10000
-  },
-  draggable: true,
-  invisible: true,
-  z: 0
-}
-export const ZOOM_RECT_OPT = {
-  shape: {
-    x: -1000,
-    y: -1000,
-    height: 5000,
-    width: 5000
-  },
-  draggable: false,
-  invisible: true,
-  z: 0,
+  style: {
+    stroke: 'red',
+    fill: 'none'
+  }
 }

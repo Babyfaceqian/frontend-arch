@@ -5,6 +5,9 @@ import Graph from 'components/graph/Graph';
 export default class Main extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      selectMode: false
+    }
   }
   componentWillMount() {
   }
@@ -30,6 +33,9 @@ export default class Main extends React.Component {
         <button onClick={this.getLinks}>Get links</button>
         <button onClick={this.setSelectedLinks}>Set selected links</button>
         <button onClick={this.clearSelectedLinks}>Clear selected links</button>
+        <button onClick={this.changeSelectMode}>Change select mode</button>
+        <button onClick={this.resetTransform}>Reset transform</button>
+
       </div>
     );
   }
@@ -100,5 +106,15 @@ export default class Main extends React.Component {
   }
   clearSelectedLinks = () => {
     this.Graph.clearSelectedLinks();
+  }
+  changeSelectMode = () => {
+    this.Graph.changeOptions({
+      selectMode: !this.state.selectMode
+    });
+    console.log('selectMode:', !this.state.selectMode)
+    this.setState({ selectMode: !this.state.selectMode })
+  }
+  resetTransform = () => {
+    this.Graph.resetTransform();
   }
 }
