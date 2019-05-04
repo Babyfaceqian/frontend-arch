@@ -22,57 +22,49 @@ export default class Main extends React.Component {
     return (
       <div className={styles.main}>
         <div id="graph" className={styles.graph}></div>
-        <button onClick={this.addNodes}>Add nodes</button>
-        <button onClick={this.getNodes}>Get nodes</button>
-        <button onClick={this.getSelectedNodes}>Get selected nodes</button>
-        <button onClick={this.setSelectedNodes}>Set selected nodes</button>
-        <button onClick={this.clearSelectedNodes}>Clear selected nodes</button>
-        <button onClick={this.setHighlightedNodes}>Set highlighted nodes</button>
-        <button onClick={this.clearHighlightedNodes}>Clear highlighted nodes</button>
-        <button onClick={this.addLinks}>Add links</button>
-        <button onClick={this.getLinks}>Get links</button>
-        <button onClick={this.setSelectedLinks}>Set selected links</button>
-        <button onClick={this.clearSelectedLinks}>Clear selected links</button>
-        <button onClick={this.changeSelectMode}>Change select mode</button>
-        <button onClick={this.resetTransform}>Reset transform</button>
-
+        <div className={styles.actions}>
+          <h3>node操作</h3>
+          <button onClick={this.addNodes}>Add nodes</button>
+          <button onClick={this.getNodes}>Get nodes</button>
+          <button onClick={this.removeNodes}>Remove nodes</button>
+          <button onClick={this.getSelectedNodes}>Get selected nodes</button>
+          <button onClick={this.setSelectedNodes}>Set selected nodes</button>
+          <button onClick={this.clearSelectedNodes}>Clear selected nodes</button>
+          <button onClick={this.setHighlightedNodes}>Set highlighted nodes</button>
+          <button onClick={this.clearHighlightedNodes}>Clear highlighted nodes</button>
+          <h3>link操作</h3>
+          <button onClick={this.addLinks}>Add links</button>
+          <button onClick={this.getLinks}>Get links</button>
+          <button onClick={this.removeLinks}>Remove links</button>
+          <button onClick={this.setSelectedLinks}>Set selected links</button>
+          <button onClick={this.clearSelectedLinks}>Clear selected links</button>
+          <h3>画布布局操作</h3>
+          <button onClick={this.resetTransform}>Reset transform</button>
+          <button onClick={this.rectangleLayout}>Rectangle layout</button>
+          <h3>画布设置操作</h3>
+          <button onClick={this.changeSelectMode}>Change select mode</button>
+        </div>
       </div>
     );
   }
   addNodes = () => {
-    this.Graph.addNodes([
-      {
-        id: '101001_1',
+    let nodes = [];
+    for (let i = 0; i < 100; i++) {
+      nodes.push({
+        id: '101001_' + i,
         data: {
           value: 1
         },
-        pattern: 0,
-      },
-      {
-        id: '101001_2',
-        data: {
-          value: 1
-        },
-        pattern: 0,
-      },
-      {
-        id: '101001_3',
-        data: {
-          value: 1
-        },
-        pattern: 0,
-      },
-      {
-        id: '101001_4',
-        data: {
-          value: 1
-        },
-        pattern: 0,
-      }
-    ])
+        pattern: 0
+      })
+    }
+    this.Graph.addNodes(nodes)
   }
   getNodes = () => {
     console.log('nodes', this.Graph.getNodes());
+  }
+  removeNodes = () => {
+    this.Graph.removeNodes(this.Graph.selectedNodes);
   }
   getSelectedNodes = () => {
     console.log('nodes', this.Graph.selectedNodes);
@@ -101,6 +93,9 @@ export default class Main extends React.Component {
   getLinks = () => {
     console.log('links', this.Graph.getLinks());
   }
+  removeLinks = () => {
+    this.Graph.removeLinks(this.Graph.getLinks())
+  }
   setSelectedLinks = () => {
     this.Graph.setSelectedLinks(this.Graph.getLinks());
   }
@@ -116,5 +111,8 @@ export default class Main extends React.Component {
   }
   resetTransform = () => {
     this.Graph.resetTransform();
+  }
+  rectangleLayout = () => {
+    this.Graph.rectangleLayout(this.Graph.getNodes());
   }
 }

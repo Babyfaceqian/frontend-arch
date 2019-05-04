@@ -117,7 +117,7 @@ Graph.prototype = {
   },
   addNodes: function (opts) {
     if (!zrender.util.isArray(opts)) throw 'arguments must be an array.'
-    opts.forEach(opt => {
+    let addNodes = opts.map(opt => {
       let pattern = opt.pattern || 0; // 选择节点模板
       let _opt = zrender.util.clone(consts.NODE_OPT[pattern]);
       _opt.shape.cx = opt.x || _opt.shape.cx; // 转换数据
@@ -140,11 +140,15 @@ Graph.prototype = {
           this.clearSelectedLinks();
           this.setSelectedNodes(selectedNodes);
         })
+        .on('dragstart', e => {
+          this.nodeDragData = {};
+          this.nodeDragData.ox = e.offsetX;
+          this.nodeDragData.oy = e.offsetY;
+        })
         .on('drag', e => {
           // 拖拽时更新link位置
           let node = e.target;
-          let link = node.link;
-          if (!link) return;
+          let link = node.link || [];
           link.forEach(l => {
             if (node.id === l.source) {
               let shape = {
@@ -161,17 +165,43 @@ Graph.prototype = {
               };
               l.attr('shape', shape);
             }
-          })
-        })
+          });
+          // 多个选中节点一起拖动
+          if (this.selectedNodes.length > 1) {
+            let dx = (e.offsetX - this.nodeDragData.ox) / this.scale;
+            let dy = (e.offsetY - this.nodeDragData.oy) / this.scale;
+            this.nodeDragData.ox = e.offsetX;
+            this.nodeDragData.oy = e.offsetY;
+            this.selectedNodes.forEach(n => {
+              if (n.id !== node.id) {
+                let x = n.position[0] + dx;
+                let y = n.position[1] + dy;
+                n.attr('position', [x, y]);
+              }
+            })
+          }
+        });
       this.nodeGroup.add(node);
+      return node;
+    });
+    this.rectangleLayout(addNodes, function () {
       // 节点动画
-      node.animateTo({
-        position: [this.zr.getWidth() / 3, this.zr.getHeight() / 3]
-      }, 1000, 500, 'cubicOut');
-    })
+      addNodes.forEach(node => {
+        node.animateTo({
+          position: [node.position[0] + 100, node.position[1] + 100]
+        }, 1000, 500, 'cubicOut');
+      });
+    });
+
   },
   getNodes: function () {
     return this.nodeGroup.children();
+  },
+  removeNodes: function (nodes) {
+    if (!Array.isArray(nodes) || nodes.length == 0) return;
+    nodes.forEach(node => {
+      this.nodeGroup.remove(node);
+    });
   },
   setSelectedNodes: function (nodes) {
     this.clearSelectedNodes();
@@ -223,6 +253,7 @@ Graph.prototype = {
       let _opt = zrender.util.clone(consts.LINK_OPT[pattern]);
       let sourceNode = this.getNodes().find(n => n.id === opt.source);
       let targetNode = this.getNodes().find(n => n.id === opt.target);
+      if (!sourceNode || !targetNode) return;
       let shape = {
         ..._opt.shape,
         x1: sourceNode.shape.cx + sourceNode.position[0],
@@ -265,6 +296,12 @@ Graph.prototype = {
   getLinks: function () {
     return this.linkGroup.children();
   },
+  removeLinks: function (links) {
+    if (!Array.isArray(links) || links.length == 0) return;
+    links.forEach(link => {
+      this.linkGroup.remove(link);
+    });
+  },
   setSelectedLinks: function (links) {
     this.clearSelectedLinks();
     this.clearSelectedNodes();
@@ -291,6 +328,7 @@ Graph.prototype = {
     this.selectedLinks = [];
   },
   zoom: function (z, origin) {
+    // 对nodeAndLinkGroup进行缩放变换
     // FIXME: 缩放位置不正确    
     this.nodeAndLinkGroup.attr('origin', origin);
     this.nodeAndLinkGroup.attr('scale', z);
@@ -303,6 +341,7 @@ Graph.prototype = {
     });
   },
   transform: function (dx, dy) {
+    // 对nodeAndLinkGroup进行平移变换
     let position = this.nodeAndLinkGroup.position || [0, 0];
     position[0] += dx;
     position[1] += dy;
@@ -321,6 +360,35 @@ Graph.prototype = {
       scale: [1, 1],
       position: [0, 0]
     }, 500, 0, 'cubicOut')
+    // node大小不随缩放变换
+    this.getNodes().forEach(node => {
+      node.animateTo({
+        shape: consts.NODE_OPT[node.pattern || 0].shape,
+      }, 500, 0, 'cubicOut');
+    });
+  },
+  rectangleLayout: function (nodes, cb) {
+    let _nodes = nodes;
+    if (!Array.isArray(_nodes) || _nodes.length == 0) {
+      _nodes = this.getNodes();
+    }
+    let sideLength = Math.ceil(Math.sqrt(_nodes.length));
+    let dx = 50,
+      dy = 50,
+      ox, oy;
+    _nodes.forEach((node, index) => {
+      if (index == 0) {
+        ox = node.position[0];
+        oy = node.position[1];
+      } else {
+        let x = ox + (index % sideLength) * dx;
+        let y = oy + parseInt(index / sideLength) * dy;
+        // node.attr('position', [x, y]);
+        node.animateTo({
+          position: [x, y]
+        }, 500, 0, 'cubicOut', cb);
+      }
+    })
   }
 }
 

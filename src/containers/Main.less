@@ -1,9 +1,19 @@
 .main {
     height: 100%;
     width: 100%;
+    display: flex;
     .graph {
-        width: 800px;
-        height: 500px;
+        width: 1000px;
+        height: 100%;
         background: #EEE;
+        display: inline-block;
+    }
+    .actions {
+        width: calc(~"100% - 1000px");
+        padding-left: 10px;
+        display: inline-block;
+        button {
+            display: block;
+        }
     }
 }
