@@ -39,6 +39,8 @@ export default class Main extends React.Component {
           <button onClick={this.setSelectedLinks}>Set selected links</button>
           <button onClick={this.clearSelectedLinks}>Clear selected links</button>
           <h3>画布布局操作</h3>
+          <button onClick={this.zoomIn}>Zoom in</button>
+          <button onClick={this.zoomOut}>Zoom out</button>
           <button onClick={this.resetTransform}>Reset transform</button>
           <button onClick={this.rectangleLayout}>Rectangle layout</button>
           <h3>画布设置操作</h3>
@@ -114,5 +116,13 @@ export default class Main extends React.Component {
   }
   rectangleLayout = () => {
     this.Graph.rectangleLayout(this.Graph.getNodes());
+  }
+  zoomIn = () => {
+    this.Graph.scale += 0.1;
+    this.Graph.zoom([this.Graph.scale, this.Graph.scale], null, true);
+  }
+  zoomOut = () => {
+    this.Graph.scale -= 0.1;
+    this.Graph.zoom([this.Graph.scale, this.Graph.scale], null, true);
   }
 }

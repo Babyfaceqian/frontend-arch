@@ -11,24 +11,51 @@ import * as consts from './constants';
  */
 const Graph = function (dom, opts = consts.INITIAL_OPTS) {
   if (!dom) throw 'A dom is required.'
-  this.init(dom, opts);
   // 功能配置
   this.options = {
     selectMode: false
   };
+  this.init(dom, opts);
 }
 Graph.prototype = {
   init: function (dom, opts) {
     this.zr = zrender.init(dom, opts);
-    this.zr.on('click', e => {
-      if (!e.target) {
-        this.clearSelectedNodes();
-        this.clearSelectedLinks();
-      }
+
+    // 用于修改鼠标样式的元素
+    // this.cursorRect = new zrender.Rect({
+    //   shape: {
+    //     x: 0,
+    //     y: 0,
+    //     width: this.zr.getWidth(),
+    //     height: this.zr.getHeight()
+    //   },
+    //   invisible: true,
+    //   z: 0,
+    //   silent: false,
+    //   cursor: '-webkit-grab'
+    // })
+    // this.zr.add(this.cursorRect)
+    // 用于监听事件的最外层元素
+    this.eventWrapper = new zrender.Rect({
+      shape: {
+        x: 0,
+        y: 0,
+        width: this.zr.getWidth(),
+        height: this.zr.getHeight()
+      },
+      invisible: true,
+      z: 0,
+      silent: false,
+      cursor: '-webkit-grab'
     })
+    this.zr.add(this.eventWrapper);
+    this.eventWrapper.on('click', e => {
+      this.clearSelectedNodes();
+      this.clearSelectedLinks();
+    });
     // 鼠标滚轮缩放
     this.scale = 1.0;
-    this.zr.on('mousewheel', e => {
+    this.eventWrapper.on('mousewheel', e => {
       let scale = this.scale;
       let newScale = scale - e.wheelDelta / 10;
       if (newScale < 0.3 || newScale > 3) return;
@@ -41,35 +68,42 @@ Graph.prototype = {
     // 画布拖拽 + 选择框
     this.dragData = {};
     this.selectData = {};
-    this.zr.on('mousedown', e => {
+    this.eventWrapper.on('mousedown', e => {
+      console.log('mousedown')
       if (this.options.selectMode) {
         // 选框
-        if (e.target == undefined) {
-          this.selectData.drag = true;
-          this.selectData.ox = e.offsetX;
-          this.selectData.oy = e.offsetY;
-          this.selectRect = new zrender.Rect({
-            ...consts.SELECT_RECT_OPT,
-            shape: {
-              x: e.offsetX,
-              y: e.offsetY,
-              width: 0,
-              height: 0
-            }
-          });
-          this.zr.add(this.selectRect);
-        }
+        // if (e.target == undefined) {
+        this.selectData.drag = true;
+        this.selectData.ox = e.offsetX;
+        this.selectData.oy = e.offsetY;
+        this.selectRect = new zrender.Rect({
+          ...consts.SELECT_RECT_OPT,
+          shape: {
+            x: e.offsetX,
+            y: e.offsetY,
+            width: 0,
+            height: 0
+          },
+          silent: true
+        });
+        this.zr.add(this.selectRect);
+        // }
       } else {
         // 拖拽
-        if (e.target == undefined) {
-          this.dragData.drag = true;
-          this.dragData.ox = e.offsetX;
-          this.dragData.oy = e.offsetY;
-        }
+        // if (e.target == undefined) {
+        this.eventWrapper.attr('cursor', '-webkit-grabbing');
+        this.dragData.drag = true;
+        this.dragData.ox = e.offsetX;
+        this.dragData.oy = e.offsetY;
+        // }
       }
     })
-    this.zr.on('mouseup', e => {
-      this.dragData.drag = false;
+    this.eventWrapper.on('mouseup', e => {
+      console.log('mouseup')
+      if (this.dragData.drag) {
+        this.dragData.drag = false;
+        this.eventWrapper.attr('cursor', '-webkit-grab');
+      }
       if (this.selectData.drag) {
         // 选框
         this.selectData.drag = false;
@@ -86,7 +120,7 @@ Graph.prototype = {
         this.zr.remove(this.selectRect);
       }
     })
-    this.zr.on('mousemove', e => {
+    this.eventWrapper.on('mousemove', e => {
       if (this.dragData.drag) {
         // 拖拽
         let dx = e.offsetX - this.dragData.ox;
@@ -167,7 +201,7 @@ Graph.prototype = {
             }
           });
           // 多个选中节点一起拖动
-          if (this.selectedNodes.length > 1) {
+          if (this.selectedNodes.length > 1 && this.selectedNodes.find(s => s.id === node.id)) {
             let dx = (e.offsetX - this.nodeDragData.ox) / this.scale;
             let dy = (e.offsetY - this.nodeDragData.oy) / this.scale;
             this.nodeDragData.ox = e.offsetX;
@@ -297,6 +331,7 @@ Graph.prototype = {
     return this.linkGroup.children();
   },
   removeLinks: function (links) {
+    // FIXME: 移除link的同时需要移除相应node上的绑定
     if (!Array.isArray(links) || links.length == 0) return;
     links.forEach(link => {
       this.linkGroup.remove(link);
@@ -327,18 +362,34 @@ Graph.prototype = {
     });
     this.selectedLinks = [];
   },
-  zoom: function (z, origin) {
+  zoom: function (z, origin, isAnimate) {
     // 对nodeAndLinkGroup进行缩放变换
-    // FIXME: 缩放位置不正确    
+    // FIXME: 缩放位置不正确
+    origin = [this.zr.getWidth() / 2, this.zr.getHeight() / 2] || origin;
     this.nodeAndLinkGroup.attr('origin', origin);
-    this.nodeAndLinkGroup.attr('scale', z);
-    // node大小不随缩放变换
-    this.getNodes().forEach(node => {
-      node.attr('shape', {
-        ...consts.NODE_OPT[node.pattern || 0].shape,
-        r: consts.NODE_OPT[node.pattern || 0].shape.r / z[0]
+    if (!isAnimate) {
+      this.nodeAndLinkGroup.attr('scale', z);
+      // node大小不随缩放变换
+      this.getNodes().forEach(node => {
+        node.attr('shape', {
+          ...consts.NODE_OPT[node.pattern || 0].shape,
+          r: consts.NODE_OPT[node.pattern || 0].shape.r / z[0]
+        });
       });
-    });
+    } else {
+      this.nodeAndLinkGroup.animateTo({
+        scale: z
+      }, 500, 0);
+      // node大小不随缩放变换
+      this.getNodes().forEach(node => {
+        node.animateTo({
+          shape: {
+            ...consts.NODE_OPT[node.pattern || 0].shape,
+            r: consts.NODE_OPT[node.pattern || 0].shape.r / z[0]
+          }
+        }, 500, 0);
+      });
+    }
   },
   transform: function (dx, dy) {
     // 对nodeAndLinkGroup进行平移变换
@@ -348,6 +399,9 @@ Graph.prototype = {
     this.nodeAndLinkGroup.attr('position', position);
   },
   changeOptions: function (opts) {
+    if (opts.selectMode !== undefined) {
+      this.eventWrapper.attr('cursor', opts.selectMode ? 'auto' : '-webkit-grab');
+    }
     let newOpts = {
       ...this.options,
       ...opts

@@ -53,5 +53,6 @@ export const SELECT_RECT_OPT = {
   style: {
     stroke: 'red',
     fill: 'none'
-  }
+  },
+  silent: true
 }
