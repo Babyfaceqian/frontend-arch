@@ -3,12 +3,30 @@
 <head>
     <meta charset="utf-8" />
     <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="lib/d3-canvas-transition.js"></script>
 </head>
 
 <body>
+    <canvas id="svg" width="500" height="400"></canvas>
     <script>
         (function () {
-            /* start your code here */
+            var svg = d3.select('#svg').canvas();
+            var data = [];
+            // 创建数据
+            d3.range(2).forEach(function (el) {
+                data.push({
+                    value: el
+                });
+            });
+            var nodeGroup = svg.append('g').attr('class', 'nodeGroup');
+            var nodes = nodeGroup.selectAll('.node').data(data);
+            var newNodes = nodes.enter().append('g').attr('class', 'node');
+            newNodes.attr('transform', 'translate(0,0)').transition().duration(1000).attr('transform', 'translate(200,200)')
+            var nodeEle = newNodes.append('circle')
+            // .attr('cx', 200)
+            // .attr('cy', 200)
+            .attr('r', 20)
+            .style('fill', 'black')
         })()
     </script>
 </body>

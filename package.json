@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "d3-canvas-transition": "^0.3.7"
+  }
+}
