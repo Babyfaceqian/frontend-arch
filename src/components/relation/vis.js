@@ -31,7 +31,7 @@ function Vis(opts, options) {
       let translate = parseTransform(list.attr('transform'));
       let newTranslate = [translate[0], translate[1] + deltaY];
       if (newTranslate[1] > 50) {
-        return list.attr('transform');
+        newTranslate = [translate[0], 50];
       }
       return 'translate(' + newTranslate[0] + ',' + newTranslate[1] + ')';
     });
@@ -117,6 +117,7 @@ Vis.prototype = {
           self.cancelHighlight(self.selectHighlight[0]);
         }
         self.selectHighlight[0] = d.key;
+        self.defaultOptions.onItemClicked && self.defaultOptions.onItemClicked(d);
       });
     items.select('.itemText').text(function (d, i) {
       return d.value;
