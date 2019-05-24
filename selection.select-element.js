@@ -26,7 +26,7 @@
   let btn2 = d3.select('body').append('button').text('check').on('click', function () {
     div.selectAll('input').checked(true);
   });
-  // d3.select(selector)，使用选择器选择元素，返回匹配的第一个元素
+  // d3.select(selector)，使用选择器选择元素，返回匹配的第一个元素，也可以直接传入dom元素
   // d3.selectAll(selector)，使用选择器选择元素，返回匹配的元素集
   // selection.select(selector)，在selection下面选择元素，返回匹配的第一个元素
   // selection.selectAll(selector)，在selection下面选择元素，返回匹配的元素集
