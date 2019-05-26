@@ -1,6 +1,7 @@
 /**
  * 知识点：selections
  * joining data, 绑定数据
+ * 在被绑定数据的选择集中添加元素后，新元素会继承该数据
  */
 (function () {
   let div = d3.select('body').append('div');
