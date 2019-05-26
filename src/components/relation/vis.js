@@ -24,19 +24,20 @@ function Vis(opts, options) {
         self.cancelHighlight(key);
       })
     }
-  }).on('wheel', function () {
-    d3.selectAll('.list').attr('transform', function () {
-      let list = d3.select(this);
-      let deltaY = d3.event.deltaY;
-      let translate = parseTransform(list.attr('transform'));
-      let newTranslate = [translate[0], translate[1] + deltaY];
-      if (newTranslate[1] > 50) {
-        newTranslate = [translate[0], 50];
-      }
-      return 'translate(' + newTranslate[0] + ',' + newTranslate[1] + ')';
-    });
-    self.updateLinks();
   })
+  // .on('wheel', function () {
+  //   d3.selectAll('.list').attr('transform', function () {
+  //     let list = d3.select(this);
+  //     let deltaY = d3.event.deltaY;
+  //     let translate = parseTransform(list.attr('transform'));
+  //     let newTranslate = [translate[0], translate[1] - deltaY];
+  //     if (newTranslate[1] > 50) {
+  //       newTranslate = [translate[0], 50];
+  //     }
+  //     return 'translate(' + newTranslate[0] + ',' + newTranslate[1] + ')';
+  //   });
+  //   self.drawLinks();
+  // })
   self.selectHighlight = [];
 
 }
@@ -52,18 +53,17 @@ Vis.prototype = {
       });
     });
     weightArray = Array.from(weightArray);
-    let maxWeight = Math.max(...weightArray);
-    let minWeight = Math.min(...weightArray);
+    let [minWeight,maxWeight] = d3.extent(weightArray);
     this.getFontSizeByWeight = interpolate(minWeight, maxWeight, self.defaultOptions.minFontSize, self.defaultOptions.maxFontSize);
     // 取消所有锁定高亮
     if (self.selectHighlight.length > 0) {
       self.cancelHighlight(self.selectHighlight[0]);
     }
-    this.updateGroup();
-    this.updateLinks();
+    this.drawGroup();
+    this.drawLinks();
     this.wrapper.selectAll('.link').lower();
   },
-  updateGroup: function () {
+  drawGroup: function () {
     let self = this;
     // 创建组
     let groups = this.wrapper.selectAll('.group').data(self.data);
@@ -74,11 +74,11 @@ Vis.prototype = {
     });
     groups.exit().remove();
     this.wrapper.selectAll('.group').each(function (d) {
-      self.updateList(d3.select(this), d);
+      self.drawList(d3.select(this), d);
     })
 
   },
-  updateList: function (group, d) {
+  drawList: function (group, d) {
     let self = this;
 
     // 创建列表容器
@@ -104,12 +104,12 @@ Vis.prototype = {
       .style('cursor', 'pointer')
       .on('mouseover', function (d) {
         self.setHighlight(d.key);
-        self.updateTooltip([d3.event.offsetX, d3.event.offsetY], [d]);
+        self.drawTooltip([d3.event.offsetX, d3.event.offsetY], [d]);
       }).on('mouseleave', function (d) {
         if (!self.selectHighlight.includes(d.key)) {
           self.cancelHighlight(d.key);
         }
-        self.updateTooltip([d3.event.offsetX, d3.event.offsetY], []);
+        self.drawTooltip([d3.event.offsetX, d3.event.offsetY], []);
       }).on('click', function (d) {
         d3.event.stopPropagation();
         self.setHighlight(d.key);
@@ -155,7 +155,7 @@ Vis.prototype = {
     }).style('fill', self.defaultOptions.titleBorderColor)
     title.exit().remove();
   },
-  updateLinks: function () {
+  drawLinks: function () {
     let self = this;
     let links = [];
     let size = self.wrapper.selectAll('.group').size();
@@ -238,7 +238,7 @@ Vis.prototype = {
       return l.key == key;
     }).style('fill', self.defaultOptions.linkColor);
   },
-  updateTooltip: function (position, data) {
+  drawTooltip: function (position, data) {
     let self = this;
     let tooltipData = self.container.selectAll('.tooltip').data(data);
     let tooltip = tooltipData.enter().append('div').attr('class', 'tooltip')
