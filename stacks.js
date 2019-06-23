@@ -25,4 +25,19 @@
   }]
   let stack = d3.stack().keys(['a', 'b']);
   console.log(stack(data))
+
+  /**
+   * stack.value([value])
+   * value访问器
+   */
+
+  /**
+   * stack.order([order])
+   * order访问器
+   */
+
+  /**
+   * stack.offset([offset])
+   * offset访问器
+   */
 }()
