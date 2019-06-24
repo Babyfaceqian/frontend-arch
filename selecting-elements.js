@@ -1,6 +1,10 @@
 ! function () {
 
   /**
+   * Selecting Elements
+   */
+
+  /**
    * d3.transition([name])
    * 返回一个新的transition。
    * selection.transition([name])
