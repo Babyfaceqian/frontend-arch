@@ -1,5 +1,7 @@
 import React from 'react';
 import styles from './Main.less';
+import UseStateDemo from '../components/useStateDemo';
+import UseEffectDemo from '../components/useEffectDemo';
 
 export default class Main extends React.Component {
   constructor(props) {
@@ -11,7 +13,10 @@ export default class Main extends React.Component {
   }
   render() {
     return (
-      <div className={styles.main}>This is React Arch branch.</div>
+      <div>
+        <UseStateDemo />
+        <UseEffectDemo />
+      </div>
     );
   }
 }
