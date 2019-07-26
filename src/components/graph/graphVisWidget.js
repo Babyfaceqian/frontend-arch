@@ -11,14 +11,22 @@ const GraphVisWidget = function (options) {
         initGraph: function () {
             let self = this;
             self.svg = self.container.append('svg');
+            self.svg.attr('width', options.element.clientWidth);
+            self.svg.attr('height', options.element.clientHeight);
             self.nodeGroup = self.svg.append('g').attr('class', 'nodeGroup');
-            self.redraw();
+            self.zoom = d3.zoom().on('zoom', function () {
+                let { x, y, k } = d3.event.transform
+                // self.nodeGroup.attr('transform', `translate(${x},${y}) scale(${k})`)
+                self.nodeGroup.selectAll('.node').attr('transform', `translate(${x},${y}) scale(${k})`)
+            });
+            self.svg.call(self.zoom);
         },
         redraw: function () {
             let self = this;
             let nodeData = self.nodeGroup.selectAll('.node').data(self.nodes, function (d) {
                 return d.id;
-            }).attr('cx', function (d) {
+            });
+            let updateNodes = nodeData.transition().duration(1000).attr('cx', function (d) {
                 return d.x;
             }).attr('cy', function (d) {
                 return d.y;
