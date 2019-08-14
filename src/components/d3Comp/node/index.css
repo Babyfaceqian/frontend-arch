@@ -1,0 +1,29 @@
+.nodeElement {
+  fill: rgba(0,0,0,0);
+  stroke: black;
+}
+.nodeElement-actived {
+  stroke: blueviolet;
+}
+
+rect.small {
+  width: 20px;
+  height: 20px;
+  transform: translate(-10px, -10px);
+}
+
+rect.medium {
+  width: 40px;
+  height: 40px;
+  transform: translate(-20px, -20px);
+}
+
+rect.large {
+  width: 60px;
+  height: 60px;
+  transform: translate(-30px, -30px);
+}
+.nodeLabel {
+  text-anchor: middle;
+  font-size: 12px;
+}
