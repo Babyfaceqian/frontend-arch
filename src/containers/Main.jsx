@@ -16,7 +16,7 @@ export default class Main extends React.Component {
   }
   render() {
     return (
-      <div className={styles.main}></div>
+      <div className={styles.main}>React</div>
     );
   }
 }
