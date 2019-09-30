@@ -21,7 +21,7 @@ export default {
     options.method = 'post';
     try {
       let res = await fetch(request, options);
-      return await res.json();
+      return res.json();
     } catch (e) {
       return undefined;
     }
@@ -41,9 +41,9 @@ export default {
     options.method = 'get';
     try {
       let res = await fetch(_url, options);
-      return await res.json();
+      return res.json();
     } catch (e) {
       return undefined;
     }
-  }
+  },
 }
