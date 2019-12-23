@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/Babyfaceqian/frontend-arch#readme",
   "dependencies": {
-    "@babel/runtime": "^7.5.5",
+    "@babel/runtime": "^7.7.6",
     "react": "^16.4.1",
     "react-dom": "^16.4.1"
   },
