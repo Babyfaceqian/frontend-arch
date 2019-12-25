@@ -20,6 +20,7 @@
   "homepage": "https://github.com/Babyfaceqian/frontend-arch#readme",
   "dependencies": {
     "@babel/runtime": "^7.7.6",
+    "antd": "^3.26.4",
     "react": "^16.4.1",
     "react-dom": "^16.4.1"
   },
@@ -31,6 +32,7 @@
     "@babel/preset-env": "^7.5.5",
     "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.6",
+    "babel-plugin-import": "^1.13.0",
     "clean-webpack-plugin": "^0.1.19",
     "copy-webpack-plugin": "^5.0.4",
     "css-loader": "^3.2.0",

@@ -4,6 +4,10 @@
     "@babel/preset-react"
   ],
   "plugins": [
+    ["import", {
+      "libraryName": "antd",
+      "style": true // or 'css'
+    }],
     ["@babel/plugin-transform-runtime", {
       "corejs": false,
       "helpers": true,
@@ -12,5 +16,4 @@
     }],
     "@babel/plugin-proposal-class-properties"
   ]
-
 }

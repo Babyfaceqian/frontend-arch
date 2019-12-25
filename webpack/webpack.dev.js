@@ -59,7 +59,7 @@ module.exports = {
     },
     {
       test: /\.less$/,
-      exclude: /node_modules/,
+      // exclude: /node_modules/,
       use: [{
         loader: "style-loader" // creates style nodes from JS strings
       }, {
@@ -71,7 +71,14 @@ module.exports = {
           }
         }
       }, {
-        loader: "less-loader" // compiles Less to CSS
+        loader: "less-loader", // compiles Less to CSS
+        options: {
+          modifyVars: {
+            'primary-color': 'green',
+            // 'hack': `true; @import "./theme.less";`, // Override with less file
+          },
+          javascriptEnabled: true,
+        },
       }]
     },
     ]

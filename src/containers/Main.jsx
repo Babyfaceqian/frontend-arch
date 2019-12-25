@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './Main.less';
-import worm from 'utils/worm';
-import * as Fetch from './api/main';
+import { Button } from 'antd';
+import 'antd/dist/antd.css';
 export default class Main extends React.Component {
   constructor(props) {
     super(props);
@@ -13,14 +13,9 @@ export default class Main extends React.Component {
   }
   render() {
     return (
-      <div className={styles.main}><button onClick={this.getWeather}>getWeather</button></div>
+      <div className={styles.main}>
+        <Button>Test</Button>
+      </div>
     );
-  }
-  getWeather = async () => {
-    let res = await Fetch.getSatin({}, true)
-    if (res && res.code == 200) {
-      console.log(res);
-      this.setState({ data: res.data })
-    }
   }
 }
