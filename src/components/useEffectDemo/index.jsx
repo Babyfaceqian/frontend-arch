@@ -3,13 +3,14 @@ import React, { useState, useEffect } from 'react';
 export default () => {
   const [count, setCount] = useState(0);
   useEffect(function () {
-    // 合并了didMount,didUpdate,willUnmount，第二个参数是每次判断是否更新的比较值，使用Object.is（类似===，除了+0不等于-0和NaN等于自身）
+    // 合并了didMount,didUpdate,willUnmount，第二个参数是每次判断是否更新的比较值，使用Object.is（类似===，除了+0不等于-0和NaN等于自身），如果不传，则每次都会触发，如果传[]，则只在第一次渲染是触发，如果传某个值，那只会在该值变化时才会触发。
     console.log(`You clicked ${count} times`);
   },
     [count])
   return (
     <div>
       <p>You clicked {count} times</p>
+      <p>update useEffect {count} times</p>
       <button onClick={() => addCount(count, setCount)}>
         Click me
       </button>
