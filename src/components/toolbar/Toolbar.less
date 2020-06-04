@@ -1,0 +1,51 @@
+.toolbar {
+  width: 100%;
+  background-color: blue;
+  overflow: hidden;
+
+  .btn {
+    margin: 4px;
+    background-color: red;
+    position: relative;
+  }
+
+  .group {
+    display: flex;
+
+    .smallAndMediumWrapper {}
+
+    .smallWrapper {
+      display: flex;
+
+      .small {
+        width: 40px;
+        height: 20px;
+        writing-mode: horizontal-tb;
+      }
+    }
+
+    .mediumWrapper {
+      display: flex;
+
+      .medium {
+        width: 32px;
+        height: 32px;
+      }
+    }
+
+    .largeWrapper {
+      display: flex;
+
+      .large {
+        width: 40px;
+        height: 56px;
+      }
+    }
+
+    .wrap {
+      writing-mode: vertical-lr;
+      max-height: 56px;
+      flex-wrap: wrap;
+    }
+  }
+}

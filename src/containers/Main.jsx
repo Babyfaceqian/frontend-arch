@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './Main.less';
-import worm from 'utils/worm';
 import * as Fetch from './api/main';
+import Toolbar from '../components/toolbar/Toolbar';
 export default class Main extends React.Component {
   constructor(props) {
     super(props);
@@ -13,7 +13,9 @@ export default class Main extends React.Component {
   }
   render() {
     return (
-      <div className={styles.main}><button onClick={this.getWeather}>getWeather</button></div>
+      <div className={styles.main}>
+        <Toolbar />
+      </div>
     );
   }
   getWeather = async () => {
