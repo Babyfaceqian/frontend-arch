@@ -9,12 +9,17 @@ class Main extends React.Component {
 		this.state = {};
 	}
 	componentWillMount() {}
-	async componentDidMount() {}
+	componentDidMount() {
+    this.props.dispatch({
+      type: 'add'
+    })
+  }
 	render() {
-		console.log("this.props", this.props);
+    console.log("this.props", this.props);
+    const { main } = this.props;
 		return (
 			<div className={styles.main}>
-				<button onClick={this.getWeather}>getWeather</button>
+				<button onClick={this.getWeather}>{main}</button>
 			</div>
 		);
 	}
@@ -34,5 +39,7 @@ export default connect(
       main: state.main
     }
   },
-	() => {}
+	(dispatch) => ({
+    dispatch
+  })
 )(Main);
