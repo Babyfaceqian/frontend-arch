@@ -2,13 +2,16 @@ import React from "react";
 import styles from "./Main.less";
 import worm from "utils/worm";
 import * as Fetch from "./api/main";
-import { connect } from "components/redux";
+import { store } from "components/redux";
+
 class Main extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {};
 	}
-	componentWillMount() {}
+	componentWillMount() {
+    store.subscribe(() => this.forceUpdate());
+  }
 	componentDidMount() {
     this.props.dispatch({
       type: 'add'
@@ -32,14 +35,4 @@ class Main extends React.Component {
 	};
 }
 
-export default connect(
-	(state) => {
-    console.log('state22', state);
-    return {
-      main: state.main
-    }
-  },
-	(dispatch) => ({
-    dispatch
-  })
-)(Main);
+export default Main;
