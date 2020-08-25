@@ -1,4 +1,74 @@
 .main {
     text-align: center;
     padding: 25%;
+
+    .wrapper {
+        width: 345px;
+    }
+
+    .headerWrapper {
+        padding: 0 12px;
+    }
+
+    .header {
+        border: 1px solid rgba(215, 215, 215, 1);
+        background: rgba(242, 245, 248, 1);
+    }
+
+    .yearWrapper {
+        display: flex;
+    }
+
+    .unit {
+        width: 20px;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(210, 217, 220, 1);;
+    }
+
+    .year {
+        flex: 1;
+        height: 30px;
+        border-bottom: 1px solid rgba(215, 215, 215, 1);
+    }
+
+    .monthWrapper {
+        display: flex;
+    }
+
+    .month {
+        flex: 1;
+        height: 30px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 0 5px;
+
+        .monthCell {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+    }
+
+    .cell {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    :global {
+        .ant-fullcalendar td {
+            border: 1px solid black;
+            height: 40px;
+        }
+
+        .ant-fullcalendar {
+            border-top: none;
+        }
+    }
 }
