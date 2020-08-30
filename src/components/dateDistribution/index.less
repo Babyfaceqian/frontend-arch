@@ -1,0 +1,91 @@
+.dateDistribution {
+  width: 300px;
+
+  .header {
+    display: flex;
+    border: 1px solid black;
+
+    .yearAndMonth {
+      flex: 1;
+
+      div {
+        display: flex;
+        align-items: center;
+        height: 30px;
+
+        &:first-child {
+          justify-content: center;
+          border-bottom: 1px solid black;
+
+          >span {
+            padding: 0 5px;
+            cursor: pointer;
+            border: 1px solid transparent;
+          }
+
+          .select {
+            border: 1px solid blue;
+          }
+        }
+
+
+        &:nth-child(2) {
+          justify-content: space-around;
+
+          >span {
+            flex: 1;
+            cursor: pointer;
+            border: 1px solid transparent;
+          }
+
+          .select {
+            border: 1px solid blue;
+          }
+
+        }
+      }
+
+    }
+
+    .unit {
+      width: 20px;
+      background: #DEDEDE;
+      color: #FFF;
+
+      div {
+        height: 30px;
+        line-height: 30px;
+      }
+    }
+  }
+
+  table {
+    width: 100%;
+    text-align: center;
+
+    th,
+    td {
+      padding: 0;
+    }
+
+    th {
+      height: 30px;
+    }
+
+    .cell {
+      width: 100%;
+      height: 30px;
+      line-height: 30px;
+    }
+
+    .otherMonth {
+      background: #EEE;
+      color: #FFF
+    }
+  }
+
+  .highlight {
+    background: lightblue;
+    color: #FFF;
+  }
+}
