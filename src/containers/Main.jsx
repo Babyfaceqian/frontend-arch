@@ -5,12 +5,12 @@ export default class Main extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			count: 8818,
+			count: 1357,
 		};
 	}
 	componentWillMount() {}
 	async componentDidMount() {
-		setTimeout(() => this.setState({ count: 99999 }), 5000);
+		setTimeout(() => this.setState({ count: 9753 }), 6000);
 	}
 	render() {
 		return (

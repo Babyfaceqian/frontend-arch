@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from "react";
 import $ from "jquery";
 import styles from "./index.less";
 
-const DURATION = 2000; // 动画总时长
+const DURATION = 5000; // 动画总时长
 function CountDown({ count = 0 }) {
 	const ref = useRef(null);
 	const [oldCount, setOldCount] = useState(null);
@@ -10,68 +10,153 @@ function CountDown({ count = 0 }) {
 		return count.toString().split("").map(Number);
 	}, [count]);
 
-	const play = (start = 0, end = 8, current, ul) => {
-		current = current || start;
-		// 根据进度计算相应的动画时间
-		let duration =
-			((current + 1 - start) * (DURATION * 2)) /
-			((end - start) * (end - start + 1)) /
-			2;
-		if (current < end) {
-			ul.find(`.${styles["before"]} .${styles["up"]} .${styles["inner"]}`).text(
-				"" + current
+	const play = (start = 0, end = 0, current, ul) => {
+		current = current === undefined ? start : current;
+
+		let reverse = start > end;
+		console.log("current", current, reverse, end);
+		if (!reverse) {
+			// 从小到大
+			// 根据进度计算相应的动画时间
+			let duration =
+				((current + 1 - start) * (DURATION * 2)) /
+				((end - start) * (end - start + 1)) /
+				2;
+			if (current < end) {
+				ul.find(
+					`.${styles["before"]} .${styles["up"]} .${styles["inner"]}`
+				).text("" + current);
+				ul.find(
+					`.${styles["before"]} .${styles["down"]} .${styles["inner"]}`
+				).text("" + current);
+				ul.find(
+					`.${styles["active"]} .${styles["up"]} .${styles["inner"]}`
+				).text("" + (current + 1));
+				ul.find(
+					`.${styles["active"]} .${styles["down"]} .${styles["inner"]}`
+				).text("" + (current + 1));
+			} else {
+				ul.find(
+					`.${styles["before"]} .${styles["up"]} .${styles["inner"]}`
+				).text("" + end);
+				ul.find(
+					`.${styles["before"]} .${styles["down"]} .${styles["inner"]}`
+				).text("" + end);
+				return;
+			}
+			ul.find(`.${styles["active"]}`).css("z-index", 1);
+			ul.find(`.${styles["before"]}`).css("z-index", 2);
+			ul.find(`.${styles["active"]} .${styles["down"]}`).css(
+				"transform",
+				`rotateX(90deg)`
 			);
-			ul.find(
-				`.${styles["before"]} .${styles["down"]} .${styles["inner"]}`
-			).text("" + current);
-			ul.find(`.${styles["active"]} .${styles["up"]} .${styles["inner"]}`).text(
-				"" + (current + 1)
-			);
-			ul.find(
-				`.${styles["active"]} .${styles["down"]} .${styles["inner"]}`
-			).text("" + (current + 1));
-		} else if (current == end) {
-			ul.find(`.${styles["before"]} .${styles["up"]} .${styles["inner"]}`).text(
-				"" + end
-			);
-			ul.find(
-				`.${styles["before"]} .${styles["down"]} .${styles["inner"]}`
-			).text("" + end);
-			return;
-		}
-		ul.find(`.${styles["active"]}`).css("z-index", 1);
-		ul.find(`.${styles["before"]}`).css("z-index", 2);
-		ul.find(`.${styles["before"]} .${styles["up"]}`)
-			.css("border-spacing", 0) // 为了能够在step函数内设置transform，实际border-spacing无作用
-			.animate(
-				{ borderSpacing: 90 },
-				{
-					step: function (now, fx) {
-						$(this).css("transform", `rotateX(${now}deg)`);
-					},
-					easing: "linear",
-					duration: duration,
-					complete: function () {
-						ul.find(`.${styles["before"]}`).css("z-index", 1);
-						ul.find(`.${styles["active"]}`).css("z-index", 2);
-						ul.find(`.${styles["active"]} .${styles["down"]}`)
-							.css("border-spacing", 90)
-							.animate(
-								{ borderSpacing: 0 },
-								{
-									step: function (now, fx) {
-										$(this).css("transform", `rotateX(${now}deg)`);
-									},
-									duration: duration,
-									easing: "linear",
-									complete: function () {
-										play(start, end, current + 1, ul);
-									},
-								}
+			ul.find(`.${styles["before"]} .${styles["up"]}`)
+				.css("border-spacing", 0) // 为了能够在step函数内设置transform，实际border-spacing无作用
+				.animate(
+					{ borderSpacing: 90 },
+					{
+						step: function (now, fx) {
+							$(this).css("transform", `rotateX(${now}deg)`);
+						},
+						easing: "linear",
+						duration: duration,
+						complete: function () {
+							ul.find(`.${styles["before"]}`).css("z-index", 1);
+							ul.find(`.${styles["active"]}`).css("z-index", 2);
+
+							ul.find(`.${styles["before"]} .${styles["up"]}`).css(
+								"transform",
+								`rotateX(0deg)`
 							);
-					},
-				}
+							ul.find(`.${styles["active"]} .${styles["down"]}`)
+								.css("border-spacing", 90)
+								.animate(
+									{ borderSpacing: 0 },
+									{
+										step: function (now, fx) {
+											$(this).css("transform", `rotateX(${now}deg)`);
+										},
+										duration: duration,
+										easing: "linear",
+										complete: function () {
+											play(start, end, current + 1, ul);
+										},
+									}
+								);
+						},
+					}
+				);
+		} else {
+			// 从大到小
+			// 根据进度计算相应的动画时间
+			let duration =
+				((start - current + 1) * (DURATION * 2)) /
+				((start - end) * (start - end + 1)) /
+				2;
+			if (current > end) {
+				ul.find(
+					`.${styles["before"]} .${styles["up"]} .${styles["inner"]}`
+				).text("" + current);
+				ul.find(
+					`.${styles["before"]} .${styles["down"]} .${styles["inner"]}`
+				).text("" + current);
+				ul.find(
+					`.${styles["active"]} .${styles["up"]} .${styles["inner"]}`
+				).text("" + (current - 1));
+				ul.find(
+					`.${styles["active"]} .${styles["down"]} .${styles["inner"]}`
+				).text("" + (current - 1));
+			} else {
+				ul.find(
+					`.${styles["before"]} .${styles["up"]} .${styles["inner"]}`
+				).text("" + end);
+				ul.find(
+					`.${styles["before"]} .${styles["down"]} .${styles["inner"]}`
+				).text("" + end);
+				return;
+			}
+			ul.find(`.${styles["active"]}`).css("z-index", 1);
+			ul.find(`.${styles["before"]}`).css("z-index", 2);
+			ul.find(`.${styles["active"]} .${styles["up"]}`).css(
+				"transform",
+				`rotateX(90deg)`
 			);
+			ul.find(`.${styles["before"]} .${styles["down"]}`)
+				.css("border-spacing", 0) // 为了能够在step函数内设置transform，实际border-spacing无作用
+				.animate(
+					{ borderSpacing: 90 },
+					{
+						step: function (now, fx) {
+							$(this).css("transform", `rotateX(${now}deg)`);
+						},
+						easing: "linear",
+						duration: duration,
+						complete: function () {
+							ul.find(`.${styles["before"]}`).css("z-index", 1);
+							ul.find(`.${styles["active"]}`).css("z-index", 2);
+							ul.find(`.${styles["before"]} .${styles["down"]}`).css(
+								"transform",
+								`rotateX(0deg)`
+							);
+							ul.find(`.${styles["active"]} .${styles["up"]}`)
+								.css("border-spacing", 90)
+								.animate(
+									{ borderSpacing: 0 },
+									{
+										step: function (now, fx) {
+											$(this).css("transform", `rotateX(${now}deg)`);
+										},
+										duration: duration,
+										easing: "linear",
+										complete: function () {
+											play(start, end, current - 1, ul);
+										},
+									}
+								);
+						},
+					}
+				);
+		}
 	};
 	useEffect(() => {
 		let oldCountArr = [];
