@@ -50,20 +50,25 @@ function CountDown({ count = 0 }) {
 				"transform",
 				`rotateX(90deg)`
 			);
+			ul.find(`.${styles["shadow"]}`).css("opacity", 0);
+
 			ul.find(`.${styles["before"]} .${styles["up"]}`)
 				.css("border-spacing", 0) // 为了能够在step函数内设置transform，实际border-spacing无作用
 				.animate(
-					{ borderSpacing: 90 },
+					{ borderSpacing: -90 },
 					{
 						step: function (now, fx) {
 							$(this).css("transform", `rotateX(${now}deg)`);
+							ul.find(`.${styles["before"]} .${styles["shadow"]}`).css(
+								"opacity",
+								Math.abs(now / 90)
+							);
 						},
 						easing: "linear",
 						duration: duration,
 						complete: function () {
 							ul.find(`.${styles["before"]}`).css("z-index", 1);
 							ul.find(`.${styles["active"]}`).css("z-index", 2);
-
 							ul.find(`.${styles["before"]} .${styles["up"]}`).css(
 								"transform",
 								`rotateX(0deg)`
@@ -75,6 +80,10 @@ function CountDown({ count = 0 }) {
 									{
 										step: function (now, fx) {
 											$(this).css("transform", `rotateX(${now}deg)`);
+											ul.find(`.${styles["before"]} .${styles["shadow"]}`).css(
+												"opacity",
+												now / 90
+											);
 										},
 										duration: duration,
 										easing: "linear",
@@ -121,6 +130,7 @@ function CountDown({ count = 0 }) {
 				"transform",
 				`rotateX(90deg)`
 			);
+			ul.find(`.${styles["shadow"]}`).css("opacity", 0);
 			ul.find(`.${styles["before"]} .${styles["down"]}`)
 				.css("border-spacing", 0) // 为了能够在step函数内设置transform，实际border-spacing无作用
 				.animate(
@@ -128,6 +138,10 @@ function CountDown({ count = 0 }) {
 					{
 						step: function (now, fx) {
 							$(this).css("transform", `rotateX(${now}deg)`);
+							ul.find(`.${styles["before"]} .${styles["shadow"]}`).css(
+								"opacity",
+								now / 90
+							);
 						},
 						easing: "linear",
 						duration: duration,
@@ -139,12 +153,16 @@ function CountDown({ count = 0 }) {
 								`rotateX(0deg)`
 							);
 							ul.find(`.${styles["active"]} .${styles["up"]}`)
-								.css("border-spacing", 90)
+								.css("border-spacing", -90)
 								.animate(
 									{ borderSpacing: 0 },
 									{
 										step: function (now, fx) {
 											$(this).css("transform", `rotateX(${now}deg)`);
+											ul.find(`.${styles["before"]} .${styles["shadow"]}`).css(
+												"opacity",
+												Math.abs(now / 90)
+											);
 										},
 										duration: duration,
 										easing: "linear",
@@ -183,22 +201,22 @@ function CountDown({ count = 0 }) {
 				<ul>
 					<li className={styles["before"]}>
 						<div className={styles["up"]}>
-							<div></div>
+							<div className={styles["shadow"]}></div>
 							<div className={styles["inner"]}></div>
 						</div>
 						<div className={styles["down"]}>
-							<div></div>
+							<div className={styles["shadow"]}></div>
 							<div className={styles["inner"]}></div>
 						</div>
 					</li>
 
 					<li className={styles["active"]}>
 						<div className={styles["up"]}>
-							<div></div>
+							<div className={styles["shadow"]}></div>
 							<div className={styles["inner"]}></div>
 						</div>
 						<div className={styles["down"]}>
-							<div></div>
+							<div className={styles["shadow"]}></div>
 							<div className={styles["inner"]}></div>
 						</div>
 					</li>
